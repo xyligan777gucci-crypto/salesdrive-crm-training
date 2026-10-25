@@ -1,101 +1,560 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM Dashboard Prototype</title>
+    <title>Asteril CRM - Обробка замовлень</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        /* Custom scrollbar for CRM tables */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
 </head>
-<body class="bg-gray-100 font-sans antialiased">
+<body class="bg-slate-100 text-slate-800 antialiased overflow-hidden flex flex-col h-screen">
 
-    <div class="flex h-screen overflow-hidden">
-        <!-- Боковое меню -->
-        <div class="w-64 bg-slate-900 text-slate-300 flex flex-col justify-between hidden md:flex">
-            <div>
-                <div class="flex items-center justify-center h-16 bg-slate-950 text-white font-bold text-xl tracking-wider">
-                    MY-CRM
-                </div>
-                <nav class="mt-6 px-4 space-y-1">
-                    <a href="#" class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg bg-blue-600 text-white">📦 Заказы</a>
-                    <a href="#" class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-slate-800 hover:text-white">👥 Клиенты</a>
-                    <a href="#" class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-slate-800 hover:text-white">📊 Аналитика</a>
-                    <a href="#" class="flex items-center px-4 py-2.5 text-sm font-medium rounded-lg hover:bg-slate-800 hover:text-white">⚙️ Настройки</a>
-                </nav>
+    <!-- Toast notification -->
+    <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 text-sm">
+        <span id="toast-icon">✨</span>
+        <span id="toast-msg">Дію виконано успішно</span>
+    </div>
+
+    <!-- TOP HEADER -->
+    <header class="bg-[#0f172a] text-white h-14 flex items-center justify-between px-4 shrink-0 border-b border-slate-800">
+        <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2">
+                <div class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white text-sm shadow">A</div>
+                <span class="font-bold tracking-wider text-base">ASTERIL CRM</span>
             </div>
-            <div class="p-4 bg-slate-950 text-xs text-slate-500 text-center">
-                v1.0.0 Prototype
+            <span class="text-xs text-slate-400 font-medium bg-slate-800/80 px-3 py-1 rounded-md border border-slate-700">ОБРОБКА ЗАМОВЛЕНЬ</span>
+        </div>
+        <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2 text-xs">
+                <span class="text-slate-300">На місці</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" checked class="sr-only peer">
+                    <div class="w-9 h-5 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-600"></div>
+                </label>
+            </div>
+            <div class="flex items-center space-x-2 text-xs bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700/60">
+                <div class="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-[10px]">ШЯ</div>
+                <span class="font-medium text-slate-200">Шеулиця Ярослав менеджер (21.05.2026)</span>
+                <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
             </div>
         </div>
+    </header>
 
-        <!-- Основная часть -->
-        <div class="flex-1 flex flex-col overflow-hidden">
-            <!-- Верхняя панель -->
-            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
-                <div class="flex items-center space-x-4">
-                    <input type="text" placeholder="Поиск по заказам, телефонам, клиентам..." class="border border-gray-300 rounded-lg px-4 py-2 text-sm w-80 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                </div>
-                <div class="flex items-center space-x-4">
-                    <span class="text-sm font-medium text-gray-700">Менеджер: Администратор</span>
-                    <div class="w-9 h-9 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">А</div>
-                </div>
-            </header>
+    <!-- MODULE NAVIGATION BAR -->
+    <nav class="bg-white border-b border-slate-200 h-12 flex items-center px-4 space-x-1 shrink-0 text-xs font-semibold text-slate-600">
+        <a href="#" class="flex items-center space-x-2 px-3 py-2 text-indigo-600 bg-indigo-50 rounded-lg border border-indigo-100">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            <span>ЗАМОВЛЕННЯ</span>
+        </a>
+        <a href="#" class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+            <span>КЛІЄНТИ</span>
+        </a>
+        <a href="#" class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+            <span>ЗАДАЧІ</span>
+        </a>
+        <a href="#" class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            <span>ТОВАРИ</span>
+        </a>
+        <a href="#" class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+            <span>ВЗАЄМОДІЯ</span>
+        </a>
+    </nav>
 
-            <!-- Контент страницы -->
-            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-2xl font-bold text-gray-800">Заказы</h1>
-                    <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">+ Новый заказ</button>
+    <!-- MAIN BODY AREA (SIDEBAR + WORKSPACE) -->
+    <div class="flex-1 flex overflow-hidden">
+        
+        <!-- LEFT SIDEBAR (STATUSES) -->
+        <aside class="w-72 bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-y-auto select-none text-xs">
+            <div class="p-3 space-y-1">
+                <div onclick="selectSidebarStatus('Усе')" id="sb-all" class="flex items-center justify-between px-3 py-2 rounded-lg cursor-pointer bg-slate-100 font-bold text-slate-900 transition-all">
+                    <span>Усе</span>
+                    <span class="bg-slate-200 text-slate-700 px-2 py-0.5 rounded-full text-[10px]">128</span>
                 </div>
 
-                <!-- Фильтры статусов -->
-                <div class="flex space-x-2 mb-6 overflow-x-auto pb-2">
-                    <button class="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium">Все (124)</button>
-                    <button class="px-4 py-2 bg-white text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium border border-gray-200">Новые (12)</button>
-                    <button class="px-4 py-2 bg-white text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium border border-gray-200">В работе (45)</button>
-                    <button class="px-4 py-2 bg-white text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium border border-gray-200">Отправлены (58)</button>
-                    <button class="px-4 py-2 bg-white text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium border border-gray-200">Выполнены (9)</button>
+                <div class="pt-2 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2">НОВИЙ</div>
+                <div onclick="selectSidebarStatus('Новий')" id="sb-new" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>Новий</span>
+                    <span class="bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-bold text-[10px]">243</span>
+                </div>
+                <div onclick="selectSidebarStatus('Розетка')" id="sb-rozetka" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span class="flex items-center space-x-1.5">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span>Розетка</span>
+                    </span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">3</span>
+                </div>
+                <div onclick="selectSidebarStatus('DROPOM')" id="sb-dropom" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>DROPOM</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">1</span>
+                </div>
+                <div onclick="selectSidebarStatus('Розетка - фулфілмент')" id="sb-rozetka-full" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>Розетка - фулфілмент</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">1</span>
+                </div>
+                <div onclick="selectSidebarStatus('Лендінги')" id="sb-landing" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>Лендінги</span>
+                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold text-[10px]">0</span>
+                </div>
+                <div onclick="selectSidebarStatus('Нові холодка')" id="sb-new-hol" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>Нові холодка</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">13</span>
+                </div>
+                <div onclick="selectSidebarStatus('камери')" id="sb-cameras" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>камери</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">10</span>
                 </div>
 
-                <!-- Таблица заказов -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
+                <div class="pt-3 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 flex justify-between items-center">
+                    <span>РОЗПОДІЛЕНІ</span>
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </div>
+                <div onclick="selectSidebarStatus('План прийому')" id="sb-plan" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700 bg-emerald-50/60 font-semibold border border-emerald-100">
+                    <span>План прийому</span>
+                    <span class="bg-emerald-600 text-white px-2 py-0.5 rounded-full font-bold text-[10px]">252</span>
+                </div>
+                <div onclick="selectSidebarStatus('план прийому холодка')" id="sb-plan-hol" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>план прийому холодка</span>
+                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold text-[10px]">0</span>
+                </div>
+                <div onclick="selectSidebarStatus('розподілені холодка')" id="sb-disp-hol" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>розподілені холодка</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">15</span>
+                </div>
+                <div onclick="selectSidebarStatus('ХВ чернетки')" id="sb-draft" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>ХВ чернетки</span>
+                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold text-[10px]">0</span>
+                </div>
+
+                <div class="pt-3 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 flex justify-between items-center">
+                    <span>ДООФОРМЛЕННЯ</span>
+                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                </div>
+                <div onclick="selectSidebarStatus('Уточнення')" id="sb-clarify" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>Уточнення</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">567</span>
+                </div>
+                <div onclick="selectSidebarStatus('На оплату')" id="sb-pay" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>На оплату</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">151</span>
+                </div>
+                <div onclick="selectSidebarStatus('Уточнення розетка')" id="sb-clar-roz" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>Уточнення розетка</span>
+                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold text-[10px]">0</span>
+                </div>
+                <div onclick="selectSidebarStatus('ВПТ холодка уточнення')" id="sb-vpt" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>ВПТ холодка уточнення</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">11</span>
+                </div>
+                <div onclick="selectSidebarStatus('уточнення АП Іван')" id="sb-ivan" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>уточнення АП Іван</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">21</span>
+                </div>
+                <div onclick="selectSidebarStatus('уточнення ап Юлія')" id="sb-julia" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>уточнення ап Юлія</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">4</span>
+                </div>
+
+                <div class="pt-3 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2">ПРИЙНЯТІ</div>
+                <div onclick="selectSidebarStatus('Термінові (з 9 до 14)')" id="sb-urgent" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
+                    <span>Термінові (з 9 до 14)</span>
+                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">155</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN WORKSPACE CONTENT -->
+        <main class="flex-1 flex flex-col overflow-hidden bg-slate-50">
+            
+            <!-- PAGE HEADER -->
+            <div class="px-6 py-4 flex justify-between items-center bg-white border-b border-slate-200 shrink-0">
+                <div>
+                    <h1 class="text-xl font-bold text-slate-900">Замовлення</h1>
+                    <p class="text-xs text-slate-500">Замовлення інтернет-магазину та маркетплейсів</p>
+                </div>
+                <button onclick="openCreateOrderModal()" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-emerald-600/20 transition-all flex items-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                    <span>СТВОРИТИ</span>
+                </button>
+            </div>
+
+            <!-- FILTERS PANEL (Exact Asteril UI match) -->
+            <div class="bg-white p-4 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 text-xs shrink-0 shadow-xs">
+                <div>
+                    <label class="block font-bold text-slate-500 mb-1">№:</label>
+                    <input type="text" id="filterId" placeholder="Пошук по ID..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-500 mb-1">Статус:</label>
+                    <select id="filterStatus" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 font-medium">
+                        <option value="">ПЛАН ПРИЙОМУ</option>
+                        <option value="Новий">Новий</option>
+                        <option value="План прийому">План прийому</option>
+                        <option value="Уточнення">Уточнення</option>
+                        <option value="На оплату">На оплату</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-500 mb-1">Відповідальний:</label>
+                    <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option>Шеулиця Ярослав менеджер (21.0...</option>
+                        <option>Усі менеджери</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-500 mb-1">Дата створення:</label>
+                    <input type="date" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-600">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-500 mb-1">Залишок за платежами:</label>
+                    <input type="text" placeholder="-" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-500 mb-1">Товари:</label>
+                    <input type="text" placeholder="Назва або SKU..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-500 mb-1">Сума:</label>
+                    <input type="text" placeholder="від - до" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-500 mb-1">Тип оплати:</label>
+                    <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">
+                        <option>Усе</option>
+                        <option>Пром-оплата</option>
+                        <option>Післяплата</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-500 mb-1">Склад відвантаження:</label>
+                    <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">
+                        <option>Усе</option>
+                        <option>Головний склад</option>
+                        <option>Холодка склад</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-500 mb-1">Джерело замовлення:</label>
+                    <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">
+                        <option>Усе</option>
+                        <option>Rozetka</option>
+                        <option>Prom.ua</option>
+                        <option>Instagram</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-500 mb-1">Магазин:</label>
+                    <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">
+                        <option>Усі магазини</option>
+                    </select>
+                </div>
+                <div class="flex items-end space-x-2">
+                    <button onclick="applyFilters()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-1.5 px-3 rounded-lg shadow transition-all flex items-center justify-center space-x-1">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v3.172a1 1 0 01-.553.894l-4 2A1 1 0 017 18.28v-5.172a1 1 0 00-.293-.707L.293 7.293A1 1 0 010 6.586V4z"/></svg>
+                        <span>ФІЛЬТРУВАТИ</span>
+                    </button>
+                    <button onclick="resetFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg transition-all" title="Скинути">
+                        ✕
+                    </button>
+                </div>
+            </div>
+
+            <!-- ORDERS TABLE AREA -->
+            <div class="flex-1 overflow-auto p-4">
+                <div class="bg-white rounded-xl shadow-xs border border-slate-200 overflow-hidden">
+                    <table class="min-w-full divide-y divide-slate-200 text-xs">
+                        <thead class="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID / Дата</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Клиент</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Товары</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Сумма</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Статус</th>
-                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Действия</th>
+                                <th class="p-3 w-10 text-center"><input type="checkbox" class="rounded border-slate-300"></th>
+                                <th class="p-3 text-left">№</th>
+                                <th class="p-3 text-left">Прибыток</th>
+                                <th class="p-3 text-left">Статус</th>
+                                <th class="p-3 text-left">Товари</th>
+                                <th class="p-3 text-left">Залишок за платежами</th>
+                                <th class="p-3 text-left">Коментар менеджера</th>
+                                <th class="p-3 text-right">Дії</th>
                             </tr>
                         </thead>
-                        <tbody class="bg-white divide-y divide-gray-200 text-sm">
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">#1042<br><span class="text-xs text-gray-400 font-normal">Сегодня, 14:20</span></td>
-                                <td class="px-6 py-4 whitespace-nowrap">Иван Петренко<br><span class="text-xs text-gray-500">+380 99 123 45 67</span></td>
-                                <td class="px-6 py-4">Беспроводные наушники (1 шт.)</td>
-                                <td class="px-6 py-4 whitespace-nowrap font-semibold">1 499 ₴</td>
-                                <td class="px-6 py-4 whitespace-nowrap"><span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">Новый</span></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button class="text-blue-600 hover:text-blue-900 mr-3">Открыть</button>
-                                </td>
-                            </tr>
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">#1041<br><span class="text-xs text-gray-400 font-normal">Сегодня, 12:05</span></td>
-                                <td class="px-6 py-4 whitespace-nowrap">Анна Коваль<br><span class="text-xs text-gray-500">+380 67 987 65 43</span></td>
-                                <td class="px-6 py-4">Смарт-часы Pro (2 шт.)</td>
-                                <td class="px-6 py-4 whitespace-nowrap font-semibold">3 200 ₴</td>
-                                <td class="px-6 py-4 whitespace-nowrap"><span class="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">В работе</span></td>
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <button class="text-blue-600 hover:text-blue-900 mr-3">Открыть</button>
-                                </td>
-                            </tr>
+                        <tbody id="ordersTableBody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                            <!-- Injected by JavaScript -->
                         </tbody>
                     </table>
                 </div>
-            </main>
+            </div>
+
+            <!-- TABLE FOOTER & PAGINATION -->
+            <div class="bg-white border-t border-slate-200 px-6 py-3 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-600 shrink-0 gap-3">
+                <div class="flex items-center space-x-4">
+                    <span id="totalInfo">Всього <strong class="text-slate-900">1</strong> записів (відображено з 1 по 1)</span>
+                    <span class="text-slate-400">|</span>
+                    <span>Загальна вартість: <strong class="text-slate-900" id="totalSum">2 490.00 ₴</strong></span>
+                    <span class="text-slate-400">|</span>
+                    <span>Ціна закупівлі: <strong class="text-slate-900" id="totalCost">2 127.01 ₴</strong></span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-1">
+                        <button class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-400 disabled:opacity-50">‹</button>
+                        <button class="px-3 py-1 rounded-lg bg-slate-900 text-white font-bold">1</button>
+                        <button class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-400">›</button>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span>Відображати по:</span>
+                        <select class="border border-slate-200 rounded-lg px-2 py-1 bg-white font-medium">
+                            <option>10</option>
+                            <option>25</option>
+                            <option>50</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- CREATE ORDER MODAL -->
+    <div id="createModal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-xl w-full mx-4 overflow-hidden transform scale-95 transition-transform duration-300" id="createModalBox">
+            <div class="px-6 py-4 bg-slate-900 text-white flex justify-between items-center">
+                <h3 class="font-bold text-sm">Створити нове замовлення</h3>
+                <button onclick="closeCreateOrderModal()" class="text-slate-400 hover:text-white font-bold text-lg">✕</button>
+            </div>
+            <div class="p-6 space-y-4 text-xs">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Ім'я клієнта</label>
+                        <input type="text" id="newClientName" placeholder="Олександр Петренко" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Телефон</label>
+                        <input type="text" id="newClientPhone" placeholder="+380..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Товар в замовленні</label>
+                    <input type="text" id="newItemName" placeholder="Електрокарт дитячий 3км/год..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Ціна продажу (₴)</label>
+                        <input type="number" id="newPrice" placeholder="2490" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Ціна закупівлі (₴)</label>
+                        <input type="number" id="newCost" placeholder="2127" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-600 mb-1">Статус</label>
+                        <select id="newStatus" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2 py-2 font-semibold">
+                            <option value="План прийому">План прийому</option>
+                            <option value="Новий">Новий</option>
+                            <option value="Уточнення">Уточнення</option>
+                            <option value="На оплату">На оплату</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Коментар менеджера</label>
+                    <textarea id="newComment" placeholder="Передзвонити після 15:00..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-20"></textarea>
+                </div>
+            </div>
+            <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end space-x-3">
+                <button onclick="closeCreateOrderModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 font-bold rounded-lg text-slate-700 transition-all">Скасувати</button>
+                <button onclick="saveNewOrder()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 font-bold text-white rounded-lg shadow transition-all">Зберегти замовлення</button>
+            </div>
         </div>
     </div>
 
+    <script>
+        // Initial dataset matching the exact screenshot context
+        let orders = [
+            {
+                id: "33977604",
+                date: "Сьогодні, 14:15",
+                client: "Андрій Коваленко",
+                phone: "+380 97 123 45 67",
+                profit: "331 ₴",
+                status: "План прийому",
+                statusColor: "bg-emerald-600 text-white",
+                items: "Електрокарт дитячий 3км/год, до 30кг, 86x54x48.5см, HL-B6, Червоний / Електричний карт складаний / Дитячий електромобіль, 23459293904, 1 шт. Пакет, 345465491, 1 шт.",
+                balance: "2 345",
+                comment: "Клієнт просив відправити Новою Поштою сьогодні."
+            },
+            {
+                id: "33977605",
+                date: "Сьогодні, 12:30",
+                client: "Олена Марченко",
+                phone: "+380 63 987 65 43",
+                profit: "540 ₴",
+                status: "Новий",
+                statusColor: "bg-blue-600 text-white",
+                items: "Дитячий квадроцикл на акумуляторах 6V, Синій, 1 шт.",
+                balance: "0",
+                comment: "Очікує підтвердження по телефону."
+            },
+            {
+                id: "33977606",
+                date: "Вчора, 18:40",
+                client: "Михайло Шевченко",
+                phone: "+380 50 555 33 22",
+                profit: "180 ₴",
+                status: "Уточнення",
+                statusColor: "bg-amber-600 text-white",
+                items: "Конструктор магнітний дитячий 100 деталей, 1 шт.",
+                balance: "1 200",
+                comment: "Уточнюється адрес доставки у місті Київ."
+            }
+        ];
+
+        let activeSidebarFilter = 'Усе';
+
+        function renderOrders(dataToRender = orders) {
+            const tbody = document.getElementById('ordersTableBody');
+            tbody.innerHTML = '';
+
+            if (dataToRender.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400 font-medium">Замовлень не знайдено</td></tr>`;
+                document.getElementById('totalInfo').innerHTML = `Всього <strong class="text-slate-900">0</strong> записів`;
+                document.getElementById('totalSum').innerText = `0.00 ₴`;
+                document.getElementById('totalCost').innerText = `0.00 ₴`;
+                return;
+            }
+
+            dataToRender.forEach(ord => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-3 text-center"><input type="checkbox" class="rounded border-slate-300"></td>
+                    <td class="p-3 font-bold text-slate-900 whitespace-nowrap">
+                        <span class="text-indigo-600 hover:underline cursor-pointer" onclick="showToast('Відкрито замовлення #${ord.id}')">#${ord.id}</span>
+                        <div class="text-[10px] text-slate-400 font-normal">${ord.date}</div>
+                    </td>
+                    <td class="p-3 font-semibold text-emerald-600 whitespace-nowrap">${ord.profit}</td>
+                    <td class="p-3 whitespace-nowrap"><span class="px-2.5 py-1 text-[11px] font-bold rounded-lg ${ord.statusColor}">${ord.status}</span></td>
+                    <td class="p-3 max-w-xs text-slate-800 leading-relaxed">${ord.items}</td>
+                    <td class="p-3 whitespace-nowrap font-bold text-slate-800">${ord.balance}</td>
+                    <td class="p-3 text-slate-600 italic">${ord.comment}</td>
+                    <td class="p-3 text-right whitespace-nowrap">
+                        <button onclick="showToast('Дія для #${ord.id}')" class="p-1 hover:bg-slate-200 rounded text-slate-600">⚙️</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('totalInfo').innerHTML = `Всього <strong class="text-slate-900">${dataToRender.length}</strong> записів (відображено з 1 по ${dataToRender.length})`;
+        }
+
+        function selectSidebarStatus(statusName) {
+            activeSidebarFilter = statusName;
+            // Highlight active sidebar item
+            document.querySelectorAll('aside div[onclick]').forEach(el => {
+                el.classList.remove('bg-slate-100', 'font-bold', 'text-slate-900', 'bg-emerald-50/60', 'border', 'border-emerald-100');
+                el.classList.add('hover:bg-slate-50', 'text-slate-700');
+            });
+            event.currentTarget.classList.remove('hover:bg-slate-50', 'text-slate-700');
+            event.currentTarget.classList.add('bg-slate-100', 'font-bold', 'text-slate-900');
+
+            if (statusName === 'Усе') {
+                renderOrders(orders);
+            } else {
+                const filtered = orders.filter(o => o.status.toLowerCase() === statusName.toLowerCase());
+                renderOrders(filtered);
+            }
+            showToast(`Фільтр: ${statusName}`);
+        }
+
+        function applyFilters() {
+            const searchId = document.getElementById('filterId').value.trim();
+            const statusVal = document.getElementById('filterStatus').value;
+
+            let result = orders;
+            if (searchId) {
+                result = result.filter(o => o.id.includes(searchId));
+            }
+            if (statusVal) {
+                result = result.filter(o => o.status.toLowerCase() === statusVal.toLowerCase());
+            }
+            renderOrders(result);
+            showToast('Фільтри застосовано!');
+        }
+
+        function resetFilters() {
+            document.getElementById('filterId').value = '';
+            document.getElementById('filterStatus').selectedIndex = 0;
+            renderOrders(orders);
+            showToast('Фільтри скинуто');
+        }
+
+        function openCreateOrderModal() {
+            const modal = document.getElementById('createModal');
+            modal.classList.remove('hidden');
+            setTimeout(() => { modal.classList.remove('opacity-0'); document.getElementById('createModalBox').classList.remove('scale-95'); }, 10);
+        }
+
+        function closeCreateOrderModal() {
+            const modal = document.getElementById('createModal');
+            modal.classList.add('opacity-0');
+            document.getElementById('createModalBox').classList.add('scale-95');
+            setTimeout(() => { modal.classList.add('hidden'); }, 300);
+        }
+
+        function saveNewOrder() {
+            const name = document.getElementById('newClientName').value || 'Новий клієнт';
+            const phone = document.getElementById('newClientPhone').value || '+380 00 000 00 00';
+            const itemName = document.getElementById('newItemName').value || 'Дитячий товар';
+            const price = parseFloat(document.getElementById('newPrice').value) || 2490;
+            const cost = parseFloat(document.getElementById('newCost').value) || 2000;
+            const status = document.getElementById('newStatus').value;
+            const comment = document.getElementById('newComment').value || 'Створено через CRM';
+
+            const profitVal = price - cost;
+            const newId = Math.floor(10000000 + Math.random() * 90000000).toString();
+
+            let color = 'bg-blue-600 text-white';
+            if (status === 'План прийому') color = 'bg-emerald-600 text-white';
+            if (status === 'Уточнення') color = 'bg-amber-600 text-white';
+
+            const newOrd = {
+                id: newId,
+                date: "Щойно",
+                client: name,
+                phone: phone,
+                profit: `${profitVal} ₴`,
+                status: status,
+                statusColor: color,
+                items: `${itemName}, 1 шт.`,
+                balance: `${price}`,
+                comment: comment
+            };
+
+            orders.unshift(newOrd);
+            renderOrders();
+            closeCreateOrderModal();
+            showToast(`Замовлення #${newId} успішно створено!`);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = msg;
+            toast.classList.remove('translate-y-[-200%]');
+            setTimeout(() => {
+                toast.classList.add('translate-y-[-200%]');
+            }, 3000);
+        }
+
+        // Initialize table on load
+        window.onload = function() {
+            renderOrders(orders);
+        };
+    </script>
 </body>
 </html>
