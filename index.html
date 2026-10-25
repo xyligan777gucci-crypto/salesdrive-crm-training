@@ -8,14 +8,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* Custom scrollbar for CRM tables */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800 antialiased overflow-hidden flex flex-col h-screen">
+<body class="bg-slate-100 text-slate-800 antialiased overflow-hidden flex flex-col h-screen select-none">
 
     <!-- Toast notification -->
     <div id="toast" class="fixed top-5 right-5 z-50 transform translate-y-[-200%] transition-transform duration-300 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-3 text-sm">
@@ -26,7 +25,7 @@
     <!-- TOP HEADER -->
     <header class="bg-[#0f172a] text-white h-14 flex items-center justify-between px-4 shrink-0 border-b border-slate-800">
         <div class="flex items-center space-x-6">
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="switchView('list')">
                 <div class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white text-sm shadow">A</div>
                 <span class="font-bold tracking-wider text-base">ASTERIL CRM</span>
             </div>
@@ -50,31 +49,30 @@
 
     <!-- MODULE NAVIGATION BAR -->
     <nav class="bg-white border-b border-slate-200 h-12 flex items-center px-4 space-x-1 shrink-0 text-xs font-semibold text-slate-600">
-        <a href="#" class="flex items-center space-x-2 px-3 py-2 text-indigo-600 bg-indigo-50 rounded-lg border border-indigo-100">
+        <a href="#" onclick="switchView('list')" class="flex items-center space-x-2 px-3 py-2 text-indigo-600 bg-indigo-50 rounded-lg border border-indigo-100">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
             <span>ЗАМОВЛЕННЯ</span>
         </a>
-        <a href="#" class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-all">
+        <a href="#" onclick="showToast('Розділ Клієнти')" class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
             <span>КЛІЄНТИ</span>
         </a>
-        <a href="#" class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-all">
+        <a href="#" onclick="showToast('Розділ Задачі')" class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
             <span>ЗАДАЧІ</span>
         </a>
-        <a href="#" class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-all">
+        <a href="#" onclick="showToast('Розділ Товари')" class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             <span>ТОВАРИ</span>
         </a>
-        <a href="#" class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-all">
+        <a href="#" onclick="showToast('Розділ Взаємодія')" class="flex items-center space-x-2 px-3 py-2 hover:bg-slate-100 rounded-lg text-slate-600 transition-all">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
             <span>ВЗАЄМОДІЯ</span>
         </a>
     </nav>
 
-    <!-- MAIN BODY AREA (SIDEBAR + WORKSPACE) -->
-    <div class="flex-1 flex overflow-hidden">
-        
+    <!-- VIEW CONTAINER: LIST VIEW -->
+    <div id="view-list" class="flex-1 flex overflow-hidden">
         <!-- LEFT SIDEBAR (STATUSES) -->
         <aside class="w-72 bg-white border-r border-slate-200 flex flex-col shrink-0 overflow-y-auto select-none text-xs">
             <div class="p-3 space-y-1">
@@ -95,51 +93,17 @@
                     </span>
                     <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">3</span>
                 </div>
-                <div onclick="selectSidebarStatus('DROPOM')" id="sb-dropom" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>DROPOM</span>
-                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">1</span>
-                </div>
-                <div onclick="selectSidebarStatus('Розетка - фулфілмент')" id="sb-rozetka-full" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>Розетка - фулфілмент</span>
-                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">1</span>
-                </div>
-                <div onclick="selectSidebarStatus('Лендінги')" id="sb-landing" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>Лендінги</span>
-                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold text-[10px]">0</span>
-                </div>
-                <div onclick="selectSidebarStatus('Нові холодка')" id="sb-new-hol" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>Нові холодка</span>
-                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">13</span>
-                </div>
-                <div onclick="selectSidebarStatus('камери')" id="sb-cameras" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>камери</span>
-                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">10</span>
-                </div>
 
                 <div class="pt-3 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 flex justify-between items-center">
                     <span>РОЗПОДІЛЕНІ</span>
-                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 </div>
                 <div onclick="selectSidebarStatus('План прийому')" id="sb-plan" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700 bg-emerald-50/60 font-semibold border border-emerald-100">
                     <span>План прийому</span>
                     <span class="bg-emerald-600 text-white px-2 py-0.5 rounded-full font-bold text-[10px]">252</span>
                 </div>
-                <div onclick="selectSidebarStatus('план прийому холодка')" id="sb-plan-hol" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>план прийому холодка</span>
-                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold text-[10px]">0</span>
-                </div>
-                <div onclick="selectSidebarStatus('розподілені холодка')" id="sb-disp-hol" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>розподілені холодка</span>
-                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">15</span>
-                </div>
-                <div onclick="selectSidebarStatus('ХВ чернетки')" id="sb-draft" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>ХВ чернетки</span>
-                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold text-[10px]">0</span>
-                </div>
 
                 <div class="pt-3 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2 flex justify-between items-center">
                     <span>ДООФОРМЛЕННЯ</span>
-                    <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
                 </div>
                 <div onclick="selectSidebarStatus('Уточнення')" id="sb-clarify" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
                     <span>Уточнення</span>
@@ -149,34 +113,11 @@
                     <span>На оплату</span>
                     <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">151</span>
                 </div>
-                <div onclick="selectSidebarStatus('Уточнення розетка')" id="sb-clar-roz" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>Уточнення розетка</span>
-                    <span class="bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold text-[10px]">0</span>
-                </div>
-                <div onclick="selectSidebarStatus('ВПТ холодка уточнення')" id="sb-vpt" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>ВПТ холодка уточнення</span>
-                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">11</span>
-                </div>
-                <div onclick="selectSidebarStatus('уточнення АП Іван')" id="sb-ivan" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>уточнення АП Іван</span>
-                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">21</span>
-                </div>
-                <div onclick="selectSidebarStatus('уточнення ап Юлія')" id="sb-julia" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>уточнення ап Юлія</span>
-                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">4</span>
-                </div>
-
-                <div class="pt-3 pb-1 text-[11px] font-bold text-slate-400 uppercase tracking-wider px-2">ПРИЙНЯТІ</div>
-                <div onclick="selectSidebarStatus('Термінові (з 9 до 14)')" id="sb-urgent" class="flex items-center justify-between px-3 py-1.5 rounded-lg cursor-pointer hover:bg-slate-50 text-slate-700">
-                    <span>Термінові (з 9 до 14)</span>
-                    <span class="bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold text-[10px]">155</span>
-                </div>
             </div>
         </aside>
 
         <!-- MAIN WORKSPACE CONTENT -->
         <main class="flex-1 flex flex-col overflow-hidden bg-slate-50">
-            
             <!-- PAGE HEADER -->
             <div class="px-6 py-4 flex justify-between items-center bg-white border-b border-slate-200 shrink-0">
                 <div>
@@ -189,7 +130,7 @@
                 </button>
             </div>
 
-            <!-- FILTERS PANEL (Exact Asteril UI match) -->
+            <!-- FILTERS PANEL -->
             <div class="bg-white p-4 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-3 text-xs shrink-0 shadow-xs">
                 <div>
                     <label class="block font-bold text-slate-500 mb-1">№:</label>
@@ -207,9 +148,8 @@
                 </div>
                 <div>
                     <label class="block font-bold text-slate-500 mb-1">Відповідальний:</label>
-                    <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <option>Шеулиця Ярослав менеджер (21.0...</option>
-                        <option>Усі менеджери</option>
+                    <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">
+                        <option>Шеулиця Ярослав менеджер</option>
                     </select>
                 </div>
                 <div>
@@ -217,56 +157,18 @@
                     <input type="date" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5 text-slate-600">
                 </div>
                 <div>
-                    <label class="block font-bold text-slate-500 mb-1">Залишок за платежами:</label>
-                    <input type="text" placeholder="-" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-500 mb-1">Товари:</label>
-                    <input type="text" placeholder="Назва або SKU..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-500 mb-1">Сума:</label>
-                    <input type="text" placeholder="від - до" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-500 mb-1">Тип оплати:</label>
+                    <label class="block font-bold text-slate-500 mb-1">Джерело:</label>
                     <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">
                         <option>Усе</option>
-                        <option>Пром-оплата</option>
-                        <option>Післяплата</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-500 mb-1">Склад відвантаження:</label>
-                    <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">
-                        <option>Усе</option>
-                        <option>Головний склад</option>
-                        <option>Холодка склад</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-500 mb-1">Джерело замовлення:</label>
-                    <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">
-                        <option>Усе</option>
+                        <option>Інтернет-магазин</option>
                         <option>Rozetka</option>
-                        <option>Prom.ua</option>
-                        <option>Instagram</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block font-bold text-slate-500 mb-1">Магазин:</label>
-                    <select class="w-full bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1.5">
-                        <option>Усі магазини</option>
                     </select>
                 </div>
                 <div class="flex items-end space-x-2">
                     <button onclick="applyFilters()" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-bold py-1.5 px-3 rounded-lg shadow transition-all flex items-center justify-center space-x-1">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707v3.172a1 1 0 01-.553.894l-4 2A1 1 0 017 18.28v-5.172a1 1 0 00-.293-.707L.293 7.293A1 1 0 010 6.586V4z"/></svg>
                         <span>ФІЛЬТРУВАТИ</span>
                     </button>
-                    <button onclick="resetFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg transition-all" title="Скинути">
-                        ✕
-                    </button>
+                    <button onclick="resetFilters()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 rounded-lg transition-all" title="Скинути">✕</button>
                 </div>
             </div>
 
@@ -278,7 +180,7 @@
                             <tr>
                                 <th class="p-3 w-10 text-center"><input type="checkbox" class="rounded border-slate-300"></th>
                                 <th class="p-3 text-left">№</th>
-                                <th class="p-3 text-left">Прибыток</th>
+                                <th class="p-3 text-left">Прибуток</th>
                                 <th class="p-3 text-left">Статус</th>
                                 <th class="p-3 text-left">Товари</th>
                                 <th class="p-3 text-left">Залишок за платежами</th>
@@ -287,38 +189,319 @@
                             </tr>
                         </thead>
                         <tbody id="ordersTableBody" class="divide-y divide-slate-100 font-medium text-slate-700">
-                            <!-- Injected by JavaScript -->
+                            <!-- Populated via JS -->
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- TABLE FOOTER & PAGINATION -->
-            <div class="bg-white border-t border-slate-200 px-6 py-3 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-600 shrink-0 gap-3">
-                <div class="flex items-center space-x-4">
-                    <span id="totalInfo">Всього <strong class="text-slate-900">1</strong> записів (відображено з 1 по 1)</span>
-                    <span class="text-slate-400">|</span>
-                    <span>Загальна вартість: <strong class="text-slate-900" id="totalSum">2 490.00 ₴</strong></span>
-                    <span class="text-slate-400">|</span>
-                    <span>Ціна закупівлі: <strong class="text-slate-900" id="totalCost">2 127.01 ₴</strong></span>
-                </div>
-                <div class="flex items-center space-x-4">
-                    <div class="flex items-center space-x-1">
-                        <button class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-400 disabled:opacity-50">‹</button>
-                        <button class="px-3 py-1 rounded-lg bg-slate-900 text-white font-bold">1</button>
-                        <button class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-400">›</button>
+            <!-- FOOTER -->
+            <div class="bg-white border-t border-slate-200 px-6 py-3 flex justify-between items-center text-xs text-slate-600 shrink-0">
+                <div id="totalInfo">Всього <strong class="text-slate-900">1</strong> записів</div>
+                <div>Загальна вартість: <strong class="text-slate-900">2 345,00 ₴</strong></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- VIEW CONTAINER: ORDER DETAIL VIEW (Initially hidden) -->
+    <div id="view-detail" class="flex-1 flex flex-col overflow-y-auto bg-slate-50 hidden">
+        <!-- DETAIL HEADER -->
+        <div class="bg-white border-b border-slate-200 px-6 py-3 flex flex-col lg:flex-row justify-between items-start lg:items-center shrink-0 gap-3 shadow-xs">
+            <div class="flex items-center space-x-4">
+                <button onclick="switchView('list')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg font-bold text-xs flex items-center space-x-1 transition-all">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    <span>До списку</span>
+                </button>
+                <div>
+                    <div class="flex items-center space-x-2 text-sm">
+                        <span class="font-bold text-slate-900 text-base">Замовлення 33977604</span>
+                        <span class="text-slate-400">/</span>
+                        <span class="text-slate-600 font-medium">435869176</span>
+                        <span class="text-slate-400">/</span>
+                        <span class="text-slate-500 text-xs">25.10.2026 12:58</span>
+                        <span class="bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded">повторне замовлення</span>
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <span>Відображати по:</span>
-                        <select class="border border-slate-200 rounded-lg px-2 py-1 bg-white font-medium">
-                            <option>10</option>
-                            <option>25</option>
-                            <option>50</option>
+                    <div class="text-xs text-slate-500">Замовлення &rsaquo; Перегляд замовлення</div>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-2 text-xs">
+                    <span class="font-bold text-slate-600">Статус:</span>
+                    <select class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 font-bold text-emerald-700 focus:ring-2 focus:ring-indigo-500">
+                        <option value="План прийому">План прийому</option>
+                        <option value="Новий">Новий</option>
+                        <option value="Уточнення">Уточнення</option>
+                        <option value="На оплату">На оплату</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS BAR -->
+        <div class="bg-white border-b border-slate-200 px-6 py-2 flex items-center space-x-2 text-xs font-semibold text-slate-700 shrink-0 overflow-x-auto">
+            <button onclick="showToast('Копіювання замовлення')" class="flex items-center space-x-1 px-3 py-1.5 hover:bg-slate-100 rounded border border-slate-200">
+                <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                <span>КОПІЮВАТИ</span>
+            </button>
+            <span class="text-slate-300">|</span>
+            <button onclick="showToast('Друк замовлення')" class="px-3 py-1.5 hover:bg-slate-100 rounded">🖨️ ДРУК</button>
+            <button onclick="showToast('Історія змін')" class="px-3 py-1.5 hover:bg-slate-100 rounded">🔄 ЗМІНИ</button>
+            <button onclick="showToast('Файли')" class="px-3 py-1.5 hover:bg-slate-100 rounded">📁 ФАЙЛИ</button>
+            <button onclick="showToast('Задачі')" class="px-3 py-1.5 hover:bg-slate-100 rounded">📋 ЗАДАЧІ</button>
+            <button onclick="showToast('SMS відправка')" class="px-3 py-1.5 hover:bg-slate-100 rounded">💬 SMS</button>
+            <button onclick="showToast('Листи')" class="px-3 py-1.5 hover:bg-slate-100 rounded">✉️ ЛИСТИ</button>
+            <button onclick="showToast('Дзвінки')" class="px-3 py-1.5 hover:bg-slate-100 rounded">📞 ДЗВІНКИ</button>
+        </div>
+
+        <!-- DETAILED FORM CONTENT -->
+        <div class="p-6 space-y-6 max-w-7xl mx-auto w-full">
+            
+            <!-- PARAMETERS GRID -->
+            <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Тип замовлення<span class="text-red-500">*</span>:</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium">
+                            <option>Дроп</option>
+                            <option>Розміщення</option>
                         </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Джерело замовлення<span class="text-red-500">*</span>:</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium">
+                            <option>Через корзину інтернет-магазину</option>
+                            <option>Розетка</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Оплата приват:</label>
+                        <input type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2" placeholder="-">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Артикул:</label>
+                        <input type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2" placeholder="-">
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Коментар менеджера:</label>
+                        <input type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2" value="Клієнт просив відправити Новою Поштою сьогодні.">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">спроби НБ:</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2"><option>Не вибраний</option></select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Доробка:</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2"><option>Не вибраний</option></select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">ДРОП:</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2"><option>Не вибраний</option></select>
+                    </div>
+
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Магазин<span class="text-red-500">*</span>:</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-bold text-indigo-600">
+                            <option>Yellow Monkey</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Відповідальний:</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2">
+                            <option>5 Шеулиця Ярослав менеджер (21.05.2026) 1030</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Зовнішній ID:</label>
+                        <input type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2" value="435869176">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">кроссейл:</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2"><option>Не вибраний</option></select>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Коментар клієнта:</label>
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700">
+                            Самовивіз або відправка Новою Поштою. Передоплата 100 грн.
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Коментар відповідального:</label>
+                        <div class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-slate-700 italic">
+                            Доставка: Нова Пошта пгт. Томаківка (Днепропетровская обл., Никопольский р-н), №1: ул. Сичова, 2а; Оплата: Наложенный платеж; Замовник: Котьков Толя, тел. +380957585378;
+                        </div>
                     </div>
                 </div>
             </div>
-        </main>
+
+            <!-- CLIENT SECTION -->
+            <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-900 text-sm">Клієнт</h3>
+                    <div class="flex items-center space-x-2 text-xs font-semibold">
+                        <button onclick="showToast('Viber дзвінок')" class="text-purple-700 hover:bg-purple-50 px-2 py-1 rounded border border-purple-200">💬 VIBER</button>
+                        <button onclick="showToast('WhatsApp чат')" class="text-emerald-700 hover:bg-emerald-50 px-2 py-1 rounded border border-emerald-200">💚 WHATSAPP</button>
+                        <button onclick="showToast('Telegram чат')" class="text-sky-700 hover:bg-sky-50 px-2 py-1 rounded border border-sky-200">✈️ TELEGRAM</button>
+                        <button onclick="showToast('Картка клієнта')" class="text-indigo-700 hover:bg-indigo-50 px-2 py-1 rounded border border-indigo-200">👤 КАРТКА КЛІЄНТА</button>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Ім'я<span class="text-red-500">*</span>:</label>
+                        <input type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium" value="Толя">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Прізвище:</label>
+                        <input type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium" value="Котьков">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">По-батькові:</label>
+                        <input type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2" value="">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">E-mail:</label>
+                        <input type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2" value="">
+                    </div>
+                </div>
+                <div class="mt-4 text-xs">
+                    <label class="block font-bold text-slate-500 mb-1">Телефони:</label>
+                    <div class="flex items-center space-x-2">
+                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg font-bold flex items-center space-x-2">
+                            <span>📞 +380957585378</span>
+                            <span class="cursor-pointer text-slate-400 hover:text-red-500">✕</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BASKET (КОШИК) SECTION -->
+            <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-900 text-sm">Кошик</h3>
+                    <button onclick="showToast('Додати товар')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold px-3 py-1.5 rounded-lg text-xs transition-all">+ ДОДАТИ</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-slate-200 text-xs">
+                        <thead class="bg-slate-50 text-slate-500 font-bold uppercase">
+                            <tr>
+                                <th class="p-3 text-left">Товар</th>
+                                <th class="p-3 text-left">Параметри</th>
+                                <th class="p-3 text-left">Артикул</th>
+                                <th class="p-3 text-left">Ціна</th>
+                                <th class="p-3 text-left">К-ть</th>
+                                <th class="p-3 text-right">Сума</th>
+                                <th class="p-3 text-right">Дії</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 font-medium text-slate-800">
+                            <tr>
+                                <td class="p-3 max-w-md">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-10 h-10 bg-slate-100 rounded border border-slate-200 shrink-0 flex items-center justify-center font-bold text-slate-400 text-xs">🛞</div>
+                                        <div>
+                                            <span class="font-bold text-indigo-600">Електрокарт дитячий 3км/год, до 30кг, 86x54x48.5см, HL-B6, Червоний / Електричний карт складаний / Дитячий електромобіль</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-3 text-slate-400">-</td>
+                                <td class="p-3">23459293904</td>
+                                <td class="p-3 font-bold">2 315,00 ₴</td>
+                                <td class="p-3"><input type="number" value="1" class="w-16 bg-slate-50 border border-slate-200 rounded p-1 text-center font-bold"></td>
+                                <td class="p-3 text-right font-bold text-slate-900">2 315,00 ₴</td>
+                                <td class="p-3 text-right">
+                                    <button onclick="showToast('Видалено товар')" class="text-slate-400 hover:text-red-500">🗑️</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="p-3 max-w-md">
+                                    <div class="flex items-start space-x-3">
+                                        <div class="w-10 h-10 bg-slate-100 rounded border border-slate-200 shrink-0 flex items-center justify-center font-bold text-slate-400 text-xs">🛍️</div>
+                                        <div>
+                                            <span class="font-bold text-indigo-600">Пакет фірмовий</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="p-3 text-slate-400">-</td>
+                                <td class="p-3">345465491</td>
+                                <td class="p-3 font-bold">30,00 ₴</td>
+                                <td class="p-3"><input type="number" value="1" class="w-16 bg-slate-50 border border-slate-200 rounded p-1 text-center font-bold"></td>
+                                <td class="p-3 text-right font-bold text-slate-900">30,00 ₴</td>
+                                <td class="p-3 text-right">
+                                    <button onclick="showToast('Видалено товар')" class="text-slate-400 hover:text-red-500">🗑️</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mt-4 pt-4 border-t border-slate-200 flex flex-col items-end text-xs space-y-1">
+                    <div>Вартість товарів: <strong class="text-slate-900">2 345,00 ₴</strong></div>
+                    <div>Знижка: <strong class="text-slate-900">0,00 ₴</strong></div>
+                    <div class="text-sm font-bold text-indigo-600 pt-1">Всього: 2 345,00 ₴</div>
+                </div>
+            </div>
+
+            <!-- PAYMENT SECTION -->
+            <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-900 text-sm">Оплата</h3>
+                    <button onclick="showToast('Додано оплату')" class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold px-3 py-1.5 rounded-lg text-xs transition-all">+ ДОДАТИ</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs items-center">
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Тип оплати:</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-bold text-slate-800">
+                            <option>Наложений платіж</option>
+                            <option>Пром-оплата</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Статус:</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium">
+                            <option>Не оплачено</option>
+                            <option>Оплачено</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Сума (₴):</label>
+                        <input type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-bold" value="2315">
+                    </div>
+                    <div class="flex items-end pt-5">
+                        <span class="text-xs font-bold text-emerald-600">Залишок: 2 345,00 ₴</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SHIPPING & NOVA POSHTA DELIVERY SECTION -->
+            <div class="bg-white rounded-xl shadow-xs border border-slate-200 p-6">
+                <h3 class="font-bold text-slate-900 text-sm mb-4">Доставка (Нова Пошта)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Обліковий запис:</label>
+                        <select class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2 font-medium">
+                            <option>КО Титаренко Марина Анатоліївна</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Місто:</label>
+                        <input type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2" value="Томаківка">
+                    </div>
+                    <div>
+                        <label class="block font-bold text-slate-500 mb-1">Відділення:</label>
+                        <input type="text" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2" value="Відділення №1: вул. Січова, 2а">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SAVE BUTTON BAR AT BOTTOM -->
+            <div class="flex justify-end space-x-3 pt-4 pb-12">
+                <button onclick="switchView('list')" class="px-5 py-2.5 bg-slate-200 hover:bg-slate-300 font-bold rounded-xl text-slate-700 text-xs transition-all">Скасувати</button>
+                <button onclick="showToast('Збережено успішно!'); switchView('list');" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 font-bold text-white rounded-xl shadow-md text-xs transition-all">ЗБЕРЕГТИ</button>
+            </div>
+        </div>
     </div>
 
     <!-- CREATE ORDER MODAL -->
@@ -341,16 +524,12 @@
                 </div>
                 <div>
                     <label class="block font-bold text-slate-600 mb-1">Товар в замовленні</label>
-                    <input type="text" id="newItemName" placeholder="Електрокарт дитячий 3км/год..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                    <input type="text" id="newItemName" placeholder="Електрокарт дитячий..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
                 </div>
-                <div class="grid grid-cols-3 gap-4">
+                <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block font-bold text-slate-600 mb-1">Ціна продажу (₴)</label>
-                        <input type="number" id="newPrice" placeholder="2490" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-                    </div>
-                    <div>
-                        <label class="block font-bold text-slate-600 mb-1">Ціна закупівлі (₴)</label>
-                        <input type="number" id="newCost" placeholder="2127" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
+                        <input type="number" id="newPrice" placeholder="2345" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
                     </div>
                     <div>
                         <label class="block font-bold text-slate-600 mb-1">Статус</label>
@@ -358,60 +537,43 @@
                             <option value="План прийому">План прийому</option>
                             <option value="Новий">Новий</option>
                             <option value="Уточнення">Уточнення</option>
-                            <option value="На оплату">На оплату</option>
                         </select>
                     </div>
                 </div>
-                <div>
-                    <label class="block font-bold text-slate-600 mb-1">Коментар менеджера</label>
-                    <textarea id="newComment" placeholder="Передзвонити після 15:00..." class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 h-20"></textarea>
-                </div>
             </div>
             <div class="px-6 py-3 bg-slate-50 border-t border-slate-200 flex justify-end space-x-3">
-                <button onclick="closeCreateOrderModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 font-bold rounded-lg text-slate-700 transition-all">Скасувати</button>
-                <button onclick="saveNewOrder()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 font-bold text-white rounded-lg shadow transition-all">Зберегти замовлення</button>
+                <button onclick="closeCreateOrderModal()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 font-bold rounded-lg text-slate-700 transition-all text-xs">Скасувати</button>
+                <button onclick="saveNewOrder()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 font-bold text-white rounded-lg shadow transition-all text-xs">Зберегти замовлення</button>
             </div>
         </div>
     </div>
 
+    <!-- APPLICATION JAVASCRIPT -->
     <script>
-        // Initial dataset matching the exact screenshot context
         let orders = [
             {
                 id: "33977604",
-                date: "Сьогодні, 14:15",
-                client: "Андрій Коваленко",
-                phone: "+380 97 123 45 67",
+                date: "Сьогодні, 12:58",
+                client: "Толя Котьков",
+                phone: "+380 95 758 53 78",
                 profit: "331 ₴",
                 status: "План прийому",
                 statusColor: "bg-emerald-600 text-white",
-                items: "Електрокарт дитячий 3км/год, до 30кг, 86x54x48.5см, HL-B6, Червоний / Електричний карт складаний / Дитячий електромобіль, 23459293904, 1 шт. Пакет, 345465491, 1 шт.",
-                balance: "2 345",
+                items: "Електрокарт дитячий 3км/год, до 30кг, 86x54x48.5см, HL-B6, Червоний / Електричний карт складаний / Дитячий електромобіль, 1 шт. Пакет фірмовий, 1 шт.",
+                balance: "2 345,00",
                 comment: "Клієнт просив відправити Новою Поштою сьогодні."
             },
             {
                 id: "33977605",
-                date: "Сьогодні, 12:30",
+                date: "Сьогодні, 11:20",
                 client: "Олена Марченко",
                 phone: "+380 63 987 65 43",
                 profit: "540 ₴",
                 status: "Новий",
                 statusColor: "bg-blue-600 text-white",
                 items: "Дитячий квадроцикл на акумуляторах 6V, Синій, 1 шт.",
-                balance: "0",
-                comment: "Очікує підтвердження по телефону."
-            },
-            {
-                id: "33977606",
-                date: "Вчора, 18:40",
-                client: "Михайло Шевченко",
-                phone: "+380 50 555 33 22",
-                profit: "180 ₴",
-                status: "Уточнення",
-                statusColor: "bg-amber-600 text-white",
-                items: "Конструктор магнітний дитячий 100 деталей, 1 шт.",
-                balance: "1 200",
-                comment: "Уточнюється адрес доставки у місті Київ."
+                balance: "4 200,00",
+                comment: "Очікує підтвердження."
             }
         ];
 
@@ -424,38 +586,58 @@
             if (dataToRender.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400 font-medium">Замовлень не знайдено</td></tr>`;
                 document.getElementById('totalInfo').innerHTML = `Всього <strong class="text-slate-900">0</strong> записів`;
-                document.getElementById('totalSum').innerText = `0.00 ₴`;
-                document.getElementById('totalCost').innerText = `0.00 ₴`;
                 return;
             }
 
             dataToRender.forEach(ord => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.className = "hover:bg-slate-50 transition-colors cursor-pointer";
+                tr.onclick = (e) => {
+                    // Prevent opening detail if checkbox is clicked directly
+                    if (e.target.tagName === 'INPUT') return;
+                    openOrderDetail(ord.id);
+                };
                 tr.innerHTML = `
                     <td class="p-3 text-center"><input type="checkbox" class="rounded border-slate-300"></td>
                     <td class="p-3 font-bold text-slate-900 whitespace-nowrap">
-                        <span class="text-indigo-600 hover:underline cursor-pointer" onclick="showToast('Відкрито замовлення #${ord.id}')">#${ord.id}</span>
+                        <span class="text-indigo-600 hover:underline">#${ord.id}</span>
                         <div class="text-[10px] text-slate-400 font-normal">${ord.date}</div>
                     </td>
                     <td class="p-3 font-semibold text-emerald-600 whitespace-nowrap">${ord.profit}</td>
                     <td class="p-3 whitespace-nowrap"><span class="px-2.5 py-1 text-[11px] font-bold rounded-lg ${ord.statusColor}">${ord.status}</span></td>
                     <td class="p-3 max-w-xs text-slate-800 leading-relaxed">${ord.items}</td>
-                    <td class="p-3 whitespace-nowrap font-bold text-slate-800">${ord.balance}</td>
+                    <td class="p-3 whitespace-nowrap font-bold text-slate-800">${ord.balance} ₴</td>
                     <td class="p-3 text-slate-600 italic">${ord.comment}</td>
                     <td class="p-3 text-right whitespace-nowrap">
-                        <button onclick="showToast('Дія для #${ord.id}')" class="p-1 hover:bg-slate-200 rounded text-slate-600">⚙️</button>
+                        <button onclick="openOrderDetail('${ord.id}')" class="px-2.5 py-1 bg-indigo-50 text-indigo-600 rounded font-bold hover:bg-indigo-100 transition-all">Відкрити</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('totalInfo').innerHTML = `Всього <strong class="text-slate-900">${dataToRender.length}</strong> записів (відображено з 1 по ${dataToRender.length})`;
+            document.getElementById('totalInfo').innerHTML = `Всього <strong class="text-slate-900">${dataToRender.length}</strong> записів`;
+        }
+
+        function switchView(viewName) {
+            const listEl = document.getElementById('view-list');
+            const detailEl = document.getElementById('view-detail');
+            if (viewName === 'list') {
+                detailEl.classList.add('hidden');
+                listEl.classList.remove('hidden');
+            } else if (viewName === 'detail') {
+                listEl.classList.add('hidden');
+                detailEl.classList.remove('hidden');
+                window.scrollTo(0, 0);
+            }
+        }
+
+        function openOrderDetail(id) {
+            switchView('detail');
+            showToast(`Відкрито замовлення #${id}`);
         }
 
         function selectSidebarStatus(statusName) {
             activeSidebarFilter = statusName;
-            // Highlight active sidebar item
             document.querySelectorAll('aside div[onclick]').forEach(el => {
                 el.classList.remove('bg-slate-100', 'font-bold', 'text-slate-900', 'bg-emerald-50/60', 'border', 'border-emerald-100');
                 el.classList.add('hover:bg-slate-50', 'text-slate-700');
@@ -469,7 +651,6 @@
                 const filtered = orders.filter(o => o.status.toLowerCase() === statusName.toLowerCase());
                 renderOrders(filtered);
             }
-            showToast(`Фільтр: ${statusName}`);
         }
 
         function applyFilters() {
@@ -484,7 +665,7 @@
                 result = result.filter(o => o.status.toLowerCase() === statusVal.toLowerCase());
             }
             renderOrders(result);
-            showToast('Фільтри застосовано!');
+            showToast('Фільтри застосовано');
         }
 
         function resetFilters() {
@@ -511,32 +692,26 @@
             const name = document.getElementById('newClientName').value || 'Новий клієнт';
             const phone = document.getElementById('newClientPhone').value || '+380 00 000 00 00';
             const itemName = document.getElementById('newItemName').value || 'Дитячий товар';
-            const price = parseFloat(document.getElementById('newPrice').value) || 2490;
-            const cost = parseFloat(document.getElementById('newCost').value) || 2000;
+            const price = parseFloat(document.getElementById('newPrice').value) || 2345;
             const status = document.getElementById('newStatus').value;
-            const comment = document.getElementById('newComment').value || 'Створено через CRM';
 
-            const profitVal = price - cost;
             const newId = Math.floor(10000000 + Math.random() * 90000000).toString();
-
             let color = 'bg-blue-600 text-white';
             if (status === 'План прийому') color = 'bg-emerald-600 text-white';
-            if (status === 'Уточнення') color = 'bg-amber-600 text-white';
 
-            const newOrd = {
+            orders.unshift({
                 id: newId,
                 date: "Щойно",
                 client: name,
                 phone: phone,
-                profit: `${profitVal} ₴`,
+                profit: "300 ₴",
                 status: status,
                 statusColor: color,
                 items: `${itemName}, 1 шт.`,
-                balance: `${price}`,
-                comment: comment
-            };
+                balance: price.toFixed(2),
+                comment: "Створено через CRM"
+            });
 
-            orders.unshift(newOrd);
             renderOrders();
             closeCreateOrderModal();
             showToast(`Замовлення #${newId} успішно створено!`);
@@ -551,7 +726,6 @@
             }, 3000);
         }
 
-        // Initialize table on load
         window.onload = function() {
             renderOrders(orders);
         };
