@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SalesDrive CRM - Симулятор Інтернет-Магазину</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        sd: {
+                            navy: '#1e293b',
+                            navyDark: '#0f172a',
+                            orange: '#f97316',
+                            orangeHover: '#ea580c',
+                            blue: '#2563eb',
+                            bg: '#f1f5f9',
+                            sidebar: '#ffffff',
+                            border: '#cbd5e1'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+        .status-btn.active {
+            background-color: #e2e8f0;
+            border-left: 4px solid #f97316;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden text-slate-800 antialiased text-xs select-none">
+
+    <!-- TOP NAV HEADER -->
+    <header class="h-11 bg-sd-navy text-white flex items-center justify-between px-4 shrink-0 shadow-md border-b border-slate-700 z-30">
+        <div class="flex items-center gap-5">
+            <div class="flex items-center gap-2 cursor-pointer">
+                <div class="bg-sd-orange text-white w-6 h-6 rounded flex items-center justify-center font-bold text-xs shadow">
+                    SD
+                </div>
+                <span class="font-bold text-sm tracking-tight">Sales<span class="text-sd-orange">Drive</span> <span class="text-[10px] font-normal text-slate-400">| Інтернет-Магазин (Тренувальна CRM)</span></span>
+            </div>
+            <nav class="hidden md:flex items-center gap-1 text-slate-300">
+                <a href="#" class="px-2.5 py-1 rounded bg-slate-800 text-sd-orange font-medium"><i class="fa-solid fa-cart-shopping"></i> Замовлення</a>
+                <a href="#" class="px-2.5 py-1 rounded hover:bg-slate-800 hover:text-white transition"><i class="fa-solid fa-users text-slate-400"></i> Покупці</a>
+                <a href="#" class="px-2.5 py-1 rounded hover:bg-slate-800 hover:text-white transition"><i class="fa-solid fa-boxes-stacked text-slate-400"></i> Склад / Товари</a>
+                <a href="#" class="px-2.5 py-1 rounded hover:bg-slate-800 hover:text-white transition"><i class="fa-solid fa-truck text-slate-400"></i> Доставка ТТН</a>
+                <a href="#" class="px-2.5 py-1 rounded hover:bg-slate-800 hover:text-white transition"><i class="fa-solid fa-chart-pie text-slate-400"></i> Звіти</a>
+            </nav>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button onclick="createNewBlankOrder()" class="px-3 py-1 bg-sd-orange hover:bg-sd-orangeHover text-white font-semibold rounded shadow transition flex items-center gap-1.5">
+                <i class="fa-solid fa-plus text-xs"></i> <span>Створити замовлення</span>
+            </button>
+            <button onclick="reset50Orders()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 font-medium rounded border border-slate-700 transition flex items-center gap-1" title="Скинути до початкових 50 замовлень">
+                <i class="fa-solid fa-rotate-right"></i> <span class="hidden sm:inline">Скинути до 50 замовлень</span>
+            </button>
+            <div class="flex items-center gap-2 pl-3 border-l border-slate-700">
+                <div class="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center font-bold text-white text-[10px]">
+                    МЕН
+                </div>
+                <span class="text-slate-200 font-medium hidden sm:inline">Менеджер з продажів</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CRM CONTAINER -->
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- LEFT SIDEBAR: STATUS CATEGORIES (18+ STATUSES) -->
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0 shadow-xs z-20">
+            <div class="p-2.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                <span class="font-bold text-slate-700 uppercase tracking-wider text-[10px]"><i class="fa-solid fa-filter text-sd-orange"></i> Статуси замовлень</span>
+                <span id="totalOrdersCounter" class="bg-slate-200 text-slate-700 font-bold px-1.5 py-0.5 rounded text-[10px]">50</span>
+            </div>
+
+            <div id="statusListContainer" class="flex-1 overflow-y-auto divide-y divide-slate-100">
+                <!-- Status Sidebar Items injected via JS -->
+            </div>
+        </aside>
+
+        <!-- CENTER MAIN WORKSPACE -->
+        <main class="flex-1 flex flex-col min-w-0 bg-slate-100">
+
+            <!-- FILTER & SEARCH BAR -->
+            <div class="bg-white border-b border-slate-200 p-2.5 flex flex-wrap items-center justify-between gap-3 shrink-0 shadow-xs">
+                <div class="flex items-center gap-2 flex-1 max-w-xl">
+                    <div class="relative flex-1">
+                        <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="text" id="searchInput" onkeyup="renderOrdersTable()" placeholder="Пошук за ФІО, телефоном, № заказа, товаром..." class="w-full bg-slate-50 border border-slate-300 rounded pl-8 pr-3 py-1.5 text-xs focus:bg-white focus:outline-none focus:border-sd-orange transition">
+                    </div>
+                    <select id="sourceFilter" onchange="renderOrdersTable()" class="bg-slate-50 border border-slate-300 rounded px-2 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-sd-orange">
+                        <option value="all">Всі джерела</option>
+                        <option value="Prom.ua">Prom.ua</option>
+                        <option value="Rozetka">Rozetka</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Сайт">Сайт</option>
+                        <option value="Telegram">Telegram</option>
+                        <option value="TikTok">TikTok</option>
+                        <option value="OLX">OLX</option>
+                    </select>
+                </div>
+
+                <div class="flex items-center gap-3 text-slate-500 font-medium">
+                    <span id="currentStatusTitle" class="text-xs font-bold text-slate-800">Показано: Статус "Новий"</span>
+                    <span id="displayedCountBadge" class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full">50 замовлень</span>
+                </div>
+            </div>
+
+            <!-- ORDERS TABLE AREA -->
+            <div class="flex-1 p-3 overflow-hidden flex flex-col">
+                <div class="bg-white rounded border border-slate-200 shadow-xs overflow-hidden flex-1 flex flex-col">
+                    <div class="overflow-auto flex-1">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead class="bg-slate-800 text-slate-200 sticky top-0 font-semibold text-[11px] z-10">
+                                <tr>
+                                    <th class="p-2 border-b border-slate-700">№ Заказа</th>
+                                    <th class="p-2 border-b border-slate-700">Дата / Час</th>
+                                    <th class="p-2 border-b border-slate-700">Джерело</th>
+                                    <th class="p-2 border-b border-slate-700">Статус</th>
+                                    <th class="p-2 border-b border-slate-700">Покупець (ФІО)</th>
+                                    <th class="p-2 border-b border-slate-700">Телефон</th>
+                                    <th class="p-2 border-b border-slate-700">Місто / Доставка</th>
+                                    <th class="p-2 border-b border-slate-700">Товари в замовленні</th>
+                                    <th class="p-2 border-b border-slate-700">Сума</th>
+                                    <th class="p-2 border-b border-slate-700">ТТН</th>
+                                    <th class="p-2 border-b border-slate-700 text-center">Оформити</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ordersTableBody" class="divide-y divide-slate-200 bg-white">
+                                <!-- Dynamic Orders Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- SALESDRIVE ORDER EDIT MODAL DRAWER -->
+    <div id="orderDrawer" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex justify-end">
+        <div class="w-full max-w-5xl bg-slate-100 h-full shadow-2xl flex flex-col overflow-hidden">
+            
+            <!-- Drawer Header -->
+            <div class="bg-sd-navy text-white px-5 py-2.5 flex items-center justify-between shrink-0 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <span id="drawerOrderTitle" class="text-base font-bold text-sd-orange">Замовлення #1001</span>
+                    <span id="drawerSourceBadge" class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">Prom.ua</span>
+                    <span class="text-xs text-slate-400" id="drawerOrderDate">25.10.2026 14:20</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="saveOrderDrawer()" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-xs flex items-center gap-1.5 transition shadow">
+                        <i class="fa-solid fa-floppy-disk"></i> Зберегти замовлення
+                    </button>
+                    <button onclick="closeOrderDrawer()" class="p-1.5 text-slate-400 hover:text-white rounded">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Drawer Content Body -->
+            <div class="flex-1 overflow-y-auto p-4 grid grid-cols-1 lg:grid-cols-12 gap-4">
+                
+                <!-- LEFT COLUMN: Client & Delivery Info (4 cols) -->
+                <div class="lg:col-span-4 space-y-3">
+                    
+                    <!-- Status Selector Box -->
+                    <div class="bg-white p-3 rounded border border-slate-200 shadow-xs space-y-1.5">
+                        <label class="block font-bold text-slate-700 text-[11px] uppercase">
+                            <i class="fa-solid fa-flag text-sd-orange"></i> Статус замовлення:
+                        </label>
+                        <select id="drawerStatusSelect" class="w-full bg-slate-50 border border-slate-300 font-bold rounded px-2.5 py-1.5 text-xs text-slate-800 focus:bg-white focus:border-sd-orange focus:outline-none">
+                            <!-- Dynamic Status Options -->
+                        </select>
+                    </div>
+
+                    <!-- Client Data Box -->
+                    <div class="bg-white p-3 rounded border border-slate-200 shadow-xs space-y-2">
+                        <div class="border-b border-slate-100 pb-1 flex items-center justify-between">
+                            <span class="font-bold text-slate-800 uppercase text-[10px]"><i class="fa-solid fa-user text-slate-400"></i> Дані покупця</span>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-medium text-slate-500">ФІО Клієнта</label>
+                            <input type="text" id="drawerClientName" class="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1 text-xs focus:bg-white focus:border-sd-orange focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-medium text-slate-500">Номер телефону</label>
+                            <input type="text" id="drawerClientPhone" class="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1 text-xs font-mono focus:bg-white focus:border-sd-orange focus:outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Delivery Box -->
+                    <div class="bg-white p-3 rounded border border-slate-200 shadow-xs space-y-2">
+                        <div class="border-b border-slate-100 pb-1 flex items-center justify-between">
+                            <span class="font-bold text-slate-800 uppercase text-[10px]"><i class="fa-solid fa-truck text-slate-400"></i> Доставка та адреса</span>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-medium text-slate-500">Служба доставки</label>
+                            <select id="drawerDeliveryService" class="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1 text-xs focus:bg-white focus:border-sd-orange focus:outline-none">
+                                <option value="Нова Пошта">Нова Пошта</option>
+                                <option value="Укрпошта">Укрпошта</option>
+                                <option value="Meest Express">Meest Express</option>
+                                <option value="Самовивіз">Самовивіз з магазину</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-medium text-slate-500">Місто доставки</label>
+                            <input type="text" id="drawerCity" class="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1 text-xs focus:bg-white focus:border-sd-orange focus:outline-none">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-medium text-slate-500">Відділення / Адреса</label>
+                            <input type="text" id="drawerBranch" class="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1 text-xs focus:bg-white focus:border-sd-orange focus:outline-none">
+                        </div>
+
+                        <!-- TTN Generator Block -->
+                        <div class="pt-2 border-t border-slate-100">
+                            <label class="block text-[10px] font-medium text-slate-500">Номер ТТН</label>
+                            <div class="flex gap-1.5 mt-0.5">
+                                <input type="text" id="drawerTTN" placeholder="Не згенеровано" class="flex-1 bg-slate-50 border border-slate-300 rounded px-2 py-1 text-xs font-mono font-bold text-slate-800 focus:outline-none">
+                                <button onclick="generateTTN()" class="px-2.5 py-1 bg-sd-navy hover:bg-slate-800 text-white rounded font-semibold text-[11px] transition flex items-center gap-1">
+                                    <i class="fa-solid fa-barcode text-sd-orange"></i> Згенерувати ТТН
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Payment Details -->
+                    <div class="bg-white p-3 rounded border border-slate-200 shadow-xs space-y-2">
+                        <span class="font-bold text-slate-800 uppercase text-[10px] block border-b border-slate-100 pb-1"><i class="fa-solid fa-credit-card text-slate-400"></i> Оплата</span>
+                        <div>
+                            <select id="drawerPaymentMethod" class="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none">
+                                <option value="Оплата при отриманні">Оплата при отриманні (Накладений платіж)</option>
+                                <option value="Передплата на карту IBAN">Передплата на карту IBAN</option>
+                                <option value="Пром-Оплата / Rozetka Pay">Пром-Оплата / Rozetka Pay</option>
+                                <option value="Оплачено 100%">Оплачено 100%</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RIGHT COLUMN: Products, Upsell & Notes (8 cols) -->
+                <div class="lg:col-span-8 space-y-3 flex flex-col">
+                    
+                    <!-- PRODUCTS TABLE IN ORDER -->
+                    <div class="bg-white p-3 rounded border border-slate-200 shadow-xs flex-1 flex flex-col">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2 mb-2">
+                            <span class="font-bold text-slate-800 uppercase text-[11px]"><i class="fa-solid fa-box text-sd-orange"></i> Склад замовлення (Товари та послуги)</span>
+                            <div class="flex items-center gap-1.5">
+                                <!-- Add Packaging Quick Buttons -->
+                                <button onclick="addPackagingItem('Коробка НП (2 кг)', 15)" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300 text-[10px] font-semibold">
+                                    + Коробка (15 грн)
+                                </button>
+                                <button onclick="addPackagingItem('Пупирчата плівка (1м)', 10)" class="px-2 py-0.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded border border-slate-300 text-[10px] font-semibold">
+                                    + Пупирка (10 грн)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Catalog Selector Dropdown (Допродажа) -->
+                        <div class="bg-slate-50 p-2 rounded border border-slate-200 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-cart-plus text-sd-orange text-sm"></i>
+                            <select id="catalogSelector" class="flex-1 bg-white border border-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:border-sd-orange">
+                                <option value="">-- Додати товар з каталогу (Допродаж) --</option>
+                                <!-- Injected from JS Catalog -->
+                            </select>
+                            <button onclick="addSelectedCatalogItem()" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded font-bold text-xs">
+                                + Додати в замовлення
+                            </button>
+                        </div>
+
+                        <!-- Items Table -->
+                        <div class="overflow-x-auto flex-1 border border-slate-200 rounded">
+                            <table class="w-full text-left text-xs border-collapse">
+                                <thead class="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200 text-[10px]">
+                                    <tr>
+                                        <th class="p-2">Назва товару</th>
+                                        <th class="p-2 w-20 text-center">Кількість</th>
+                                        <th class="p-2 w-24">Ціна (грн)</th>
+                                        <th class="p-2 w-24">Сума (грн)</th>
+                                        <th class="p-2 w-10 text-center">Видалити</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="drawerProductsTableBody" class="divide-y divide-slate-100">
+                                    <!-- Dynamic product rows -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Financial Summary Box -->
+                        <div class="mt-3 p-3 bg-amber-50 rounded border border-amber-200 flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <div>
+                                    <span class="text-[10px] text-slate-500 uppercase font-semibold block">Скидка (грн):</span>
+                                    <input type="number" id="drawerDiscountInput" value="0" onchange="recalculateDrawerTotals()" class="w-20 bg-white border border-slate-300 rounded px-2 py-0.5 text-xs font-bold focus:outline-none">
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-[10px] text-slate-500 font-bold uppercase block">Загальна сума до сплати:</span>
+                                <span id="drawerTotalSum" class="text-lg font-black text-sd-orange">0 грн</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MANAGERS NOTES & TIMELINE -->
+                    <div class="bg-white p-3 rounded border border-slate-200 shadow-xs space-y-2">
+                        <span class="font-bold text-slate-800 uppercase text-[10px] block border-b border-slate-100 pb-1"><i class="fa-solid fa-comments text-slate-400"></i> Коментар менеджера та Історія</span>
+                        <div class="flex gap-2">
+                            <input type="text" id="drawerNewNote" placeholder="Напишіть примітку (наприклад: Клієнт просив відправити після 15:00)..." class="flex-1 bg-slate-50 border border-slate-300 rounded px-2.5 py-1 text-xs focus:bg-white focus:outline-none">
+                            <button onclick="addManagerNote()" class="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-white rounded font-semibold text-xs">
+                                Додати примітку
+                            </button>
+                        </div>
+                        <div id="drawerTimeline" class="max-h-28 overflow-y-auto space-y-1 bg-slate-50 p-2 rounded border border-slate-200 text-[11px] text-slate-600">
+                            <!-- Dynamic history logs -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-900 text-white px-4 py-2.5 rounded-lg shadow-2xl flex items-center gap-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50 text-xs font-medium">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+        <span id="toastMessage">Замовлення успішно збережено!</span>
+    </div>
+
+    <!-- JS CRM SIMULATOR ENGINE -->
+    <script>
+        // 1. STATUSES CONFIGURATION (18 Statuses)
+        const STATUSES = [
+            { id: 'new', label: 'Новий', color: 'bg-blue-500 text-white', icon: 'fa-star' },
+            { id: 'processing', label: 'В обробці / Перетелефонувати', color: 'bg-amber-500 text-white', icon: 'fa-phone' },
+            { id: 'confirmed', label: 'Підтверджено', color: 'bg-emerald-600 text-white', icon: 'fa-check' },
+            { id: 'awaiting_payment', label: 'Очікує оплати', color: 'bg-purple-600 text-white', icon: 'fa-clock' },
+            { id: 'paid', label: 'Оплачено', color: 'bg-teal-600 text-white', icon: 'fa-credit-card' },
+            { id: 'packing', label: 'Комплектується', color: 'bg-indigo-600 text-white', icon: 'fa-boxes-packing' },
+            { id: 'packed', label: 'Упаковано', color: 'bg-cyan-600 text-white', icon: 'fa-box' },
+            { id: 'ready_for_dispatch', label: 'Готовий до відправки', color: 'bg-sky-600 text-white', icon: 'fa-dolly' },
+            { id: 'dispatched', label: 'Передано в доставку', color: 'bg-blue-700 text-white', icon: 'fa-truck-ramp-box' },
+            { id: 'in_transit', label: 'В дорозі / ТТН створено', color: 'bg-indigo-700 text-white', icon: 'fa-truck-fast' },
+            { id: 'arrived', label: 'Прибув у відділення', color: 'bg-violet-600 text-white', icon: 'fa-location-dot' },
+            { id: 'completed', label: 'Отримано / Виконано', color: 'bg-green-700 text-white', icon: 'fa-circle-check' },
+            { id: 'refused', label: 'Відмова / Повернення', color: 'bg-rose-600 text-white', icon: 'fa-rotate-left' },
+            { id: 'cancelled', label: 'Скасовано', color: 'bg-slate-500 text-white', icon: 'fa-ban' },
+            { id: 'awaiting_stock', label: 'Очікує товар', color: 'bg-amber-700 text-white', icon: 'fa-warehouse' },
+            { id: 'no_answer_1', label: 'Недодзвін 1', color: 'bg-orange-400 text-white', icon: 'fa-phone-slash' },
+            { id: 'no_answer_2', label: 'Недодзвін 2', color: 'bg-orange-500 text-white', icon: 'fa-phone-slash' },
+            { id: 'no_answer_3', label: 'Недодзвін 3', color: 'bg-orange-600 text-white', icon: 'fa-phone-slash' },
+            { id: 'duplicate', label: 'Дублікат', color: 'bg-slate-400 text-white', icon: 'fa-copy' }
+        ];
+
+        // 2. STORE PRODUCTS CATALOG (For Upsell & Item addition)
+        const STORE_CATALOG = [
+            { id: 'p1', name: 'Кросівки Nike Air Force 1 White (42 р.)', price: 2450 },
+            { id: 'p2', name: 'Бездротові навушники AirPods Pro 2 Rep', price: 1290 },
+            { id: 'p3', name: 'Павербанк Remax 20000 mAh 22.5W', price: 890 },
+            { id: 'p4', name: 'Автомобільний тримач з бездротовою зарядкою', price: 540 },
+            { id: 'p5', name: 'Смарт-годинник Xiaomi Smart Band 8', price: 1450 },
+            { id: 'p6', name: 'Чохол силіконовий MagSafe iPhone 14/15', price: 290 },
+            { id: 'p7', name: 'Захисне скло 9D iPhone (універсальне)', price: 150 },
+            { id: 'p8', name: 'Набір автокосметики Turtle Wax (4 в 1)', price: 780 },
+            { id: 'p9', name: 'Спортивна сумка Gym Bag Black', price: 620 },
+            { id: 'p10', name: 'Коробка НП (2 кг)', price: 15 },
+            { id: 'p11', name: 'Пупирчата плівка (1м)', price: 10 }
+        ];
+
+        // Dynamic Database State
+        let ordersData = [];
+        let activeStatusFilter = 'new';
+        let activeEditingOrderId = null;
+
+        // Sample Data Generation Engine (Generates 50 unique realistic Ukrainian e-commerce orders)
+        function generate50InitialOrders() {
+            const firstNames = ['Олександр', 'Максим', 'Артем', 'Дмитро', 'Богдан', 'Ярослав', 'Олена', 'Ірина', 'Анастасія', 'Катерина', 'Оксана', 'Сергій', 'Віталій', 'Андрій', 'Наталія'];
+            const lastNames = ['Коваленко', 'Шевченко', 'Бойко', 'Мельник', 'Ткаченко', 'Кравченко', 'Ковальчук', 'Олійник', 'Шевчук', 'Поліщук', 'Ткачук', 'Бондаренко'];
+            const cities = [
+                { city: 'Київ', branch: 'Відділення №45 (вул. Хрещатик, 15)' },
+                { city: 'Харків', branch: 'Відділення №12 (просп. Науки, 20)' },
+                { city: 'Одеса', branch: 'Відділення №8 (вул. Канатна, 36)' },
+                { city: 'Дніпро', branch: 'Відділення №3 (вул. Робоча, 166)' },
+                { city: 'Львів', branch: 'Відділення №1 (вул. Городоцька, 355)' },
+                { city: 'Запоріжжя', branch: 'Відділення №5 (просп. Соборний, 84)' },
+                { city: 'Вінниця', branch: 'Відділення №9 (вул. Келецька, 51)' },
+                { city: 'Полтава', branch: 'Відділення №2 (вул. Європейська, 22)' }
+            ];
+            const sources = ['Prom.ua', 'Rozetka', 'Instagram', 'Сайт', 'Telegram', 'TikTok', 'OLX'];
+
+            let generated = [];
+            for (let i = 1; i <= 50; i++) {
+                const orderId = 1000 + i;
+                const fn = firstNames[Math.floor(Math.random() * firstNames.length)];
+                const ln = lastNames[Math.floor(Math.random() * lastNames.length)];
+                const cityInfo = cities[Math.floor(Math.random() * cities.length)];
+                const source = sources[Math.floor(Math.random() * sources.length)];
+                
+                // Select 1 to 2 random items from catalog
+                const item1 = STORE_CATALOG[Math.floor(Math.random() * (STORE_CATALOG.length - 2))];
+                let items = [{ name: item1.name, price: item1.price, qty: 1 }];
+
+                if (Math.random() > 0.6) {
+                    const item2 = STORE_CATALOG[Math.floor(Math.random() * (STORE_CATALOG.length - 2))];
+                    items.push({ name: item2.name, price: item2.price, qty: 1 });
+                }
+
+                const totalSum = items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+                generated.push({
+                    id: orderId,
+                    date: `25.10.2026 ${10 + Math.floor(i/5)}:${(i * 7) % 60 < 10 ? '0' : ''}${(i * 7) % 60}`,
+                    source: source,
+                    status: 'new', // ALL 50 START IN "NEW" STATUS
+                    clientName: `${fn} ${ln}`,
+                    phone: `+380${Math.floor(670000000 + Math.random() * 30000000)}`,
+                    deliveryService: 'Нова Пошта',
+                    city: cityInfo.city,
+                    branch: cityInfo.branch,
+                    paymentMethod: Math.random() > 0.4 ? 'Оплата при отриманні' : 'Передплата на карту IBAN',
+                    ttn: '',
+                    discount: 0,
+                    items: items,
+                    totalSum: totalSum,
+                    timeline: [
+                        { time: '25.10.2026 10:00', text: `Замовлення імпортовано з ${source}` }
+                    ]
+                });
+            }
+            return generated;
+        }
+
+        // INIT APP
+        window.onload = function() {
+            // Check local storage or generate fresh 50 orders
+            const saved = localStorage.getItem('salesdrive_orders');
+            if (saved) {
+                try {
+                    ordersData = JSON.parse(saved);
+                } catch(e) {
+                    ordersData = generate50InitialOrders();
+                }
+            } else {
+                ordersData = generate50InitialOrders();
+            }
+
+            renderSidebarStatuses();
+            renderCatalogDropdown();
+            renderOrdersTable();
+        };
+
+        function saveToLocalStorage() {
+            localStorage.setItem('salesdrive_orders', JSON.stringify(ordersData));
+        }
+
+        function reset50Orders() {
+            if (confirm('Скинути базу даних до початкових 50 замовлень в статусі "Новий"?')) {
+                ordersData = generate50InitialOrders();
+                saveToLocalStorage();
+                activeStatusFilter = 'new';
+                renderSidebarStatuses();
+                renderOrdersTable();
+                showToast('Базу скинуто до 50 нових замовлень!');
+            }
+        }
+
+        // RENDER SIDEBAR STATUSES WITH COUNTERS
+        function renderSidebarStatuses() {
+            const container = document.getElementById('statusListContainer');
+            container.innerHTML = '';
+
+            let totalCount = ordersData.length;
+            document.getElementById('totalOrdersCounter').innerText = totalCount;
+
+            STATUSES.forEach(st => {
+                const count = ordersData.filter(o => o.status === st.id).length;
+                const isActive = activeStatusFilter === st.id;
+
+                const btn = document.createElement('button');
+                btn.className = `w-full px-3 py-2 text-left flex items-center justify-between transition border-b border-slate-100 ${isActive ? 'bg-orange-50 font-bold border-l-4 border-l-sd-orange text-sd-navy' : 'hover:bg-slate-50 text-slate-700'}`;
+                btn.onclick = () => {
+                    activeStatusFilter = st.id;
+                    renderSidebarStatuses();
+                    renderOrdersTable();
+                };
+
+                btn.innerHTML = `
+                    <div class="flex items-center gap-2 truncate">
+                        <span class="w-2 h-2 rounded-full ${st.color.split(' ')[0]}"></span>
+                        <span class="truncate text-[11px]">${st.label}</span>
+                    </div>
+                    <span class="px-1.5 py-0.2 text-[10px] font-bold rounded ${count > 0 ? (isActive ? 'bg-sd-orange text-white' : 'bg-slate-200 text-slate-800') : 'text-slate-400 bg-slate-100'}">
+                        ${count}
+                    </span>
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        // RENDER ORDERS MAIN TABLE
+        function renderOrdersTable() {
+            const tbody = document.getElementById('ordersTableBody');
+            tbody.innerHTML = '';
+
+            const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            const sourceFilter = document.getElementById('sourceFilter').value;
+
+            const currentStatusObj = STATUSES.find(s => s.id === activeStatusFilter) || STATUSES[0];
+            document.getElementById('currentStatusTitle').innerText = `Показано статус: "${currentStatusObj.label}"`;
+
+            let filtered = ordersData.filter(o => {
+                const matchesStatus = (o.status === activeStatusFilter);
+                const matchesSource = (sourceFilter === 'all' || o.source === sourceFilter);
+                const matchesSearch = o.clientName.toLowerCase().includes(searchQuery) ||
+                                      o.phone.includes(searchQuery) ||
+                                      o.id.toString().includes(searchQuery) ||
+                                      (o.ttn && o.ttn.includes(searchQuery)) ||
+                                      o.items.some(i => i.name.toLowerCase().includes(searchQuery));
+
+                return matchesStatus && matchesSource && matchesSearch;
+            });
+
+            document.getElementById('displayedCountBadge').innerText = `${filtered.length} замовлень`;
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="11" class="p-8 text-center text-slate-400">
+                            <i class="fa-solid fa-folder-open text-3xl mb-2 block"></i>
+                            У цьому статусі немає замовлень
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            filtered.forEach(o => {
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50 transition cursor-pointer';
+                tr.onclick = (e) => {
+                    // Prevent opening drawer if clicking action button
+                    if (!e.target.closest('.action-btn')) {
+                        openOrderDrawer(o.id);
+                    }
+                };
+
+                const statusObj = STATUSES.find(s => s.id === o.status) || STATUSES[0];
+                const itemsSummary = o.items.map(i => `${i.name} (${i.qty} шт)`).join(', ');
+
+                tr.innerHTML = `
+                    <td class="p-2 font-bold text-sd-blue">#${o.id}</td>
+                    <td class="p-2 text-slate-500 text-[10px]">${o.date}</td>
+                    <td class="p-2">
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-slate-100 border border-slate-300 text-slate-700">
+                            ${o.source}
+                        </span>
+                    </td>
+                    <td class="p-2">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold ${statusObj.color}">
+                            ${statusObj.label}
+                        </span>
+                    </td>
+                    <td class="p-2 font-semibold text-slate-800">${o.clientName}</td>
+                    <td class="p-2 font-mono text-slate-600">${o.phone}</td>
+                    <td class="p-2 text-slate-600 truncate max-w-xs">${o.city}, ${o.branch}</td>
+                    <td class="p-2 text-slate-700 truncate max-w-xs" title="${itemsSummary}">${itemsSummary}</td>
+                    <td class="p-2 font-bold text-slate-900">${o.totalSum} грн</td>
+                    <td class="p-2 font-mono ${o.ttn ? 'text-emerald-700 font-bold' : 'text-slate-400'}">
+                        ${o.ttn || '—'}
+                    </td>
+                    <td class="p-2 text-center">
+                        <button onclick="openOrderDrawer(${o.id})" class="action-btn px-2.5 py-1 bg-sd-orange hover:bg-sd-orangeHover text-white rounded font-bold text-[10px] transition shadow-xs">
+                            Оформити
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // POPULATE CATALOG DROPDOWN
+        function renderCatalogDropdown() {
+            const select = document.getElementById('catalogSelector');
+            select.innerHTML = '<option value="">-- Додати товар з каталогу (Допродаж) --</option>';
+            STORE_CATALOG.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.name} — ${p.price} грн</option>`;
+            });
+        }
+
+        // OPEN ORDER EDIT DRAWER MODAL
+        function openOrderDrawer(orderId) {
+            const order = ordersData.find(o => o.id === orderId);
+            if (!order) return;
+
+            activeEditingOrderId = orderId;
+
+            document.getElementById('drawerOrderTitle').innerText = `Замовлення #${order.id}`;
+            document.getElementById('drawerSourceBadge').innerText = order.source;
+            document.getElementById('drawerOrderDate').innerText = order.date;
+
+            // Render Status Options
+            const statusSelect = document.getElementById('drawerStatusSelect');
+            statusSelect.innerHTML = '';
+            STATUSES.forEach(st => {
+                const opt = document.createElement('option');
+                opt.value = st.id;
+                opt.innerText = st.label;
+                if (st.id === order.status) opt.selected = true;
+                statusSelect.appendChild(opt);
+            });
+
+            // Client & Delivery inputs
+            document.getElementById('drawerClientName').value = order.clientName;
+            document.getElementById('drawerClientPhone').value = order.phone;
+            document.getElementById('drawerDeliveryService').value = order.deliveryService || 'Нова Пошта';
+            document.getElementById('drawerCity').value = order.city;
+            document.getElementById('drawerBranch').value = order.branch;
+            document.getElementById('drawerTTN').value = order.ttn || '';
+            document.getElementById('drawerPaymentMethod').value = order.paymentMethod || 'Оплата при отриманні';
+            document.getElementById('drawerDiscountInput').value = order.discount || 0;
+
+            renderDrawerProductsTable(order.items);
+            renderDrawerTimeline(order.timeline);
+
+            document.getElementById('orderDrawer').classList.remove('hidden');
+        }
+
+        function closeOrderDrawer() {
+            document.getElementById('orderDrawer').classList.add('hidden');
+            activeEditingOrderId = null;
+        }
+
+        // RENDER DRAWER PRODUCTS TABLE
+        function renderDrawerProductsTable(items) {
+            const tbody = document.getElementById('drawerProductsTableBody');
+            tbody.innerHTML = '';
+
+            items.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="p-2">
+                        <input type="text" value="${item.name}" onchange="updateItemField(${index}, 'name', this.value)" class="w-full bg-slate-50 border border-slate-300 rounded px-1.5 py-0.5 text-xs focus:bg-white">
+                    </td>
+                    <td class="p-2">
+                        <input type="number" min="1" value="${item.qty}" onchange="updateItemField(${index}, 'qty', this.value)" class="w-16 bg-slate-50 border border-slate-300 rounded px-1.5 py-0.5 text-xs text-center font-bold focus:bg-white">
+                    </td>
+                    <td class="p-2">
+                        <input type="number" value="${item.price}" onchange="updateItemField(${index}, 'price', this.value)" class="w-20 bg-slate-50 border border-slate-300 rounded px-1.5 py-0.5 text-xs font-bold focus:bg-white">
+                    </td>
+                    <td class="p-2 font-bold text-slate-800">${item.price * item.qty} грн</td>
+                    <td class="p-2 text-center">
+                        <button onclick="removeDrawerItem(${index})" class="text-rose-600 hover:text-rose-800 p-1">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            recalculateDrawerTotals();
+        }
+
+        function updateItemField(index, field, value) {
+            const order = ordersData.find(o => o.id === activeEditingOrderId);
+            if (!order) return;
+
+            if (field === 'qty' || field === 'price') {
+                order.items[index][field] = parseFloat(value) || 0;
+            } else {
+                order.items[index][field] = value;
+            }
+            renderDrawerProductsTable(order.items);
+        }
+
+        function removeDrawerItem(index) {
+            const order = ordersData.find(o => o.id === activeEditingOrderId);
+            if (!order) return;
+            order.items.splice(index, 1);
+            renderDrawerProductsTable(order.items);
+        }
+
+        function addSelectedCatalogItem() {
+            const order = ordersData.find(o => o.id === activeEditingOrderId);
+            const select = document.getElementById('catalogSelector');
+            const productId = select.value;
+            if (!productId || !order) return;
+
+            const catalogItem = STORE_CATALOG.find(p => p.id === productId);
+            if (catalogItem) {
+                order.items.push({ name: catalogItem.name, price: catalogItem.price, qty: 1 });
+                order.timeline.push({ time: getCurrentTimeStr(), text: `Додано товар: ${catalogItem.name}` });
+                renderDrawerProductsTable(order.items);
+                renderDrawerTimeline(order.timeline);
+                select.value = '';
+                showToast('Товар успішно додано в замовлення!');
+            }
+        }
+
+        function addPackagingItem(name, price) {
+            const order = ordersData.find(o => o.id === activeEditingOrderId);
+            if (!order) return;
+            order.items.push({ name: name, price: price, qty: 1 });
+            order.timeline.push({ time: getCurrentTimeStr(), text: `Додано упаковку: ${name}` });
+            renderDrawerProductsTable(order.items);
+            renderDrawerTimeline(order.timeline);
+            showToast('Упаковку додано!');
+        }
+
+        function recalculateDrawerTotals() {
+            const order = ordersData.find(o => o.id === activeEditingOrderId);
+            if (!order) return;
+
+            const discount = parseFloat(document.getElementById('drawerDiscountInput').value) || 0;
+            order.discount = discount;
+
+            const subtotal = order.items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            const finalTotal = Math.max(0, subtotal - discount);
+
+            order.totalSum = finalTotal;
+            document.getElementById('drawerTotalSum').innerText = `${finalTotal} грн`;
+        }
+
+        function generateTTN() {
+            const order = ordersData.find(o => o.id === activeEditingOrderId);
+            if (!order) return;
+
+            // Generate 14-digit Nova Poshta Style TTN
+            const random10Digit = Math.floor(1000000000 + Math.random() * 9000000000);
+            const newTTN = `2045${random10Digit}`;
+
+            document.getElementById('drawerTTN').value = newTTN;
+            order.ttn = newTTN;
+            order.timeline.push({ time: getCurrentTimeStr(), text: `Згенеровано ТТН Нової Пошти: ${newTTN}` });
+            renderDrawerTimeline(order.timeline);
+            showToast('ТТН Нової Пошти згенеровано!');
+        }
+
+        function addManagerNote() {
+            const input = document.getElementById('drawerNewNote');
+            const text = input.value.trim();
+            const order = ordersData.find(o => o.id === activeEditingOrderId);
+
+            if (text && order) {
+                order.timeline.push({ time: getCurrentTimeStr(), text: `Примітка: ${text}` });
+                renderDrawerTimeline(order.timeline);
+                input.value = '';
+            }
+        }
+
+        function renderDrawerTimeline(timeline) {
+            const container = document.getElementById('drawerTimeline');
+            container.innerHTML = '';
+            timeline.slice().reverse().forEach(t => {
+                container.innerHTML += `
+                    <div class="border-b border-slate-200 pb-1 mb-1">
+                        <span class="text-[9px] font-bold text-slate-400 block">${t.time}</span>
+                        <span class="text-slate-700">${t.text}</span>
+                    </div>
+                `;
+            });
+        }
+
+        function saveOrderDrawer() {
+            const order = ordersData.find(o => o.id === activeEditingOrderId);
+            if (!order) return;
+
+            const oldStatus = order.status;
+            const newStatus = document.getElementById('drawerStatusSelect').value;
+
+            order.clientName = document.getElementById('drawerClientName').value;
+            order.phone = document.getElementById('drawerClientPhone').value;
+            order.deliveryService = document.getElementById('drawerDeliveryService').value;
+            order.city = document.getElementById('drawerCity').value;
+            order.branch = document.getElementById('drawerBranch').value;
+            order.ttn = document.getElementById('drawerTTN').value;
+            order.paymentMethod = document.getElementById('drawerPaymentMethod').value;
+            order.status = newStatus;
+
+            if (oldStatus !== newStatus) {
+                const stLabel = STATUSES.find(s => s.id === newStatus)?.label || newStatus;
+                order.timeline.push({ time: getCurrentTimeStr(), text: `Змінено статус на: "${stLabel}"` });
+            }
+
+            saveToLocalStorage();
+            renderSidebarStatuses();
+            renderOrdersTable();
+            closeOrderDrawer();
+            showToast(`Замовлення #${order.id} успішно збережено!`);
+        }
+
+        function createNewBlankOrder() {
+            const newId = 1000 + ordersData.length + 1;
+            const newOrder = {
+                id: newId,
+                date: getCurrentTimeStr(),
+                source: 'Сайт',
+                status: 'new',
+                clientName: 'Новий Покупець',
+                phone: '+380',
+                deliveryService: 'Нова Пошта',
+                city: 'Київ',
+                branch: 'Відділення №1',
+                paymentMethod: 'Оплата при отриманні',
+                ttn: '',
+                discount: 0,
+                items: [{ name: 'Новий товар', price: 500, qty: 1 }],
+                totalSum: 500,
+                timeline: [{ time: getCurrentTimeStr(), text: 'Замовлення створено вручну менеджером' }]
+            };
+
+            ordersData.unshift(newOrder);
+            saveToLocalStorage();
+            activeStatusFilter = 'new';
+            renderSidebarStatuses();
+            renderOrdersTable();
+            openOrderDrawer(newId);
+            showToast('Нове замовлення створено!');
+        }
+
+        function getCurrentTimeStr() {
+            const d = new Date();
+            const day = String(d.getDate()).padStart(2, '0');
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const year = d.getFullYear();
+            const hours = String(d.getHours()).padStart(2, '0');
+            const mins = String(d.getMinutes()).padStart(2, '0');
+            return `${day}.${month}.${year} ${hours}:${mins}`;
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
